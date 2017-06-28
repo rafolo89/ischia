@@ -68,6 +68,44 @@
     <script src="js/services.js"></script>
 
 
+    <script src="js/app.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/routes.js"></script>
+    <script src="js/directives.js"></script>
+    <script src="js/services.js"></script>
+
+
+    <script src="lib/ngstorage/ngStorage.min.js"></script>
+
+    <!--Firebase-->
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.7/firebase.js"></script>
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>-->
+    <script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
+    <script src="lib/ng-cordova-oauth/dist/ng-cordova-oauth.min.js"></script>
+
+    <script>
+      var config = {
+        apiKey: "AIzaSyD8gPs0-GEFasRk82HDn5EpwIT-XJa_zqA",
+        authDomain: "ischiamap.firebaseapp.com",
+        databaseURL: "https://ischiamap.firebaseio.com",
+        projectId: "ischiamap",
+        storageBucket: "ischiamap.appspot.com",
+        messagingSenderId: "332028451533"
+      };
+      firebase.initializeApp(config);
+      console.log(firebase)
+
+      window.database = firebase.database();
+      window.storage = firebase.storage();
+    </script>
+
+
   </head>
   <body ng-app="app" animation="slide-left-right-ios7">
   <div>

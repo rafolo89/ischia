@@ -49,11 +49,11 @@ angular.module('app.controllers', [])
           $scope.closeModal();
           var listPopup = $ionicPopup.show({
             scope: $scope,
-            template: '<ion-list class="myPopup">'+
+            template: '<ion-list class="myPopup">' +
             '  <ion-item style="opacity: 0.5!important;color:#387EF5;font-weight: bold;" ' +
-            '           ng-repeat="item in listPaths" ng-click="visualizzaListaPercorsiPOI(item)"> '+
-            '    Percorso {{$index+1}}                            '+
-            '  </ion-item>                             '+
+            '           ng-repeat="item in listPaths" ng-click="visualizzaListaPercorsiPOI(item)"> ' +
+            '    Percorso {{$index+1}}                            ' +
+            '  </ion-item>                             ' +
             '</ion-list>                               ',
             title: $scope.listPaths[0].percorso,
             subTitle: 'Seleziona Alternativa',
@@ -168,11 +168,11 @@ angular.module('app.controllers', [])
         var myPathLocalStorage = JSON.parse(localStorage.getItem('personalPOI'));
         for (var i = 0; i < myPathLocalStorage.length; i++) {
           if (myPathLocalStorage[i].id === myPath.id) {
-           $scope.exit() ;
-           myPathLocalStorage.splice(i, 1);
+            $scope.exit();
+            myPathLocalStorage.splice(i, 1);
           }
         }
-        if(myPathLocalStorage.length == 0) {
+        if (myPathLocalStorage.length == 0) {
           localStorage.removeItem('personalPOI');
         }
         else
@@ -445,11 +445,11 @@ angular.module('app.controllers', [])
         poiPersonal = undefined;
         poigeosec = undefined;
         poivari = undefined;
-        $scope.attivoA='';
-        $scope.attivoB='';
-        $scope.attivoC='';
-        $scope.attivoD='';
-        $scope.attivoE='';
+        $scope.attivoA = '';
+        $scope.attivoB = '';
+        $scope.attivoC = '';
+        $scope.attivoD = '';
+        $scope.attivoE = '';
       }
 
       $scope.show = function () {
@@ -707,3 +707,31 @@ angular.module('app.controllers', [])
         });
       };
     }])
+
+  .controller('loginCtrl', ['$scope', '$stateParams', '$cordovaOauth', '$state', '$localStorage', '$ionicPopup',
+    function ($scope, $stateParams, $cordovaOauth, $state, $localStorage, $ionicPopup) {
+      if ($localStorage.uid) {
+        $state.go("home");
+      }
+      else {
+        $scope.login = function () {
+          var provider = new firebase.auth.FacebookAuthProvider();
+          firebase.auth().signInWithPopup(provider).then(function (result) {
+            // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            $localStorage.uid = result.user.uid;
+          }).catch(function (error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+          });
+        }
+      }
+    }
+  ]);
