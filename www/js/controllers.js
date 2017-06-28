@@ -201,10 +201,9 @@ angular.module('app.controllers', [])
     }])
 
   .controller('homeCtrl', ['$scope', '$ionicModal', '$http', '$window', '$cordovaGeolocation', '$ionicLoading',
-    '$ionicPopup', 'dati', 'Layer', 'datiJson', 'shareData', '$rootScope', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    '$ionicPopup', 'dati', 'Layer', 'datiJson', 'shareData', '$rootScope', 'getOntology', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     function ($scope, $ionicModal, $http, $window, $cordovaGeolocation, $ionicLoading,
-              $ionicPopup, dati, Layer, datiJson, shareData, $rootScope) {
-
+              $ionicPopup, dati, Layer, datiJson, shareData, $rootScope, getOntology) {
       dati.setInfo($http, $ionicPopup, $window);
       datiJson.load($http);
       map;

@@ -316,4 +316,35 @@ angular.module('app.services', [])
         }
     }
 })
+.service('getOntology', function() {
+    
+    this.hotel = function($http){
+        var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
+        var query = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
+        +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>"
+        +" SELECT ?nome ?longitudine ?latitudine WHERE {"
+        +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
+        +"?subject propCoordinate:long ?latitudine. {{?subject tipo:<http://www.geonames.org/ontology#S.HTL>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.MUS>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.CH>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.GDN>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.OBPT>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.SQR>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.STDM>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.CSTL>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.ZOO>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.THTR>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.ATHF>.}}}";
 
+        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(query) + "&format=json";
+
+        $http.get(queryUrl)
+        .success(function(data, status, headers, config){
+            return(data);
+        })
+        .error(function(status)
+        {
+            return(null);
+        });  
+    }
+})
