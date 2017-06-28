@@ -201,11 +201,14 @@ angular.module('app.controllers', [])
     }])
 
   .controller('homeCtrl', ['$scope', '$ionicModal', '$http', '$window', '$cordovaGeolocation', '$ionicLoading',
-    '$ionicPopup', 'dati', 'Layer', 'datiJson', 'shareData', '$rootScope', 'getOntology', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    '$ionicPopup', 'dati', 'Layer', 'shareData', '$rootScope', 'getOntology', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     function ($scope, $ionicModal, $http, $window, $cordovaGeolocation, $ionicLoading,
-              $ionicPopup, dati, Layer, datiJson, shareData, $rootScope, getOntology) {
+              $ionicPopup, dati, Layer, shareData, $rootScope, getOntology) {
       dati.setInfo($http, $ionicPopup, $window);
-      datiJson.load($http);
+      getOntology.spiaggia($http);
+      getOntology.vari($http);
+      getOntology.hotel($http);
+      getOntology.myPois($http);
       map;
       geosec;
       var view, vectorLayer, layer, feature, geosec, array,
@@ -261,7 +264,7 @@ angular.module('app.controllers', [])
       $scope.poiSpiaggia = function () {
         if (!poispiaggia) {
           poispiaggia = Layer.posizionaPunto(window.myJson[0], 'icon/spiaggia.png');
-          map.addLayer(poispiaggia);
+              map.addLayer(poispiaggia);
         } else {
           Layer.viewLayer(poispiaggia);
         }
@@ -362,6 +365,8 @@ angular.module('app.controllers', [])
           var stringa = "";
           if (feature.get('src'))
             stringa += "<br><img  width='100%' height='100%'  src='" + feature.get('src') + "'><br>";
+            if (feature.get('description'))
+            stringa += "<br><b>Descrizione:<br></b>" + feature.get('description');         
           if (feature.get('nom_itiner'))
             stringa += "<br><b>Nome percorso:<br></b>" + feature.get('percorso') + "<br><b>Nome itinerario:<br></b>" + feature.get('nom_itiner');
           var createPOIPopup = $ionicPopup.show({
