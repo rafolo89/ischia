@@ -317,14 +317,18 @@ angular.module('app.services', [])
     }
 })
 .service('getOntology', function() {
-    
-    this.hotel = function($http){
-        var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
-        var query = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
-        +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>"
-        +" SELECT ?nome ?longitudine ?latitudine WHERE {"
+    var prefixQuery = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
+        +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>";
+
+    var baseQuery = " SELECT ?nome ?longitudine ?latitudine WHERE {"
         +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
-        +"?subject propCoordinate:long ?latitudine. {{?subject tipo:<http://www.geonames.org/ontology#S.HTL>.}"
+        +"?subject propCoordinate:long ?latitudine.";
+    
+    var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
+    
+    this.hotel = function($http){        
+        var queryHotel = prefixQuery + baseQuery
+        +" {{?subject tipo:<http://www.geonames.org/ontology#S.HTL>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.MUS>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.CH>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.GDN>.}"
@@ -336,15 +340,71 @@ angular.module('app.services', [])
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.THTR>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.ATHF>.}}}";
 
-        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(query) + "&format=json";
+        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(queryHotel) + "&format=json";
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            return(data);
+            //Processare Poi Hotel
         })
         .error(function(status)
         {
-            return(null);
+            console.log(status);
+        });  
+    }
+    
+    this.vari = function($http){        
+        var queryVari = prefixQuery + baseQuery
+        +" {{?subject tipo:<http://www.geonames.org/ontology#L.AMUS>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#L.PRK>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#T.VLC>.}}}";
+
+        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(queryVari) + "&format=json";
+
+        $http.get(queryUrl)
+        .success(function(data, status, headers, config){
+            //Processare Poi Vari
+        })
+        .error(function(status)
+        {
+            console.log(status);
+        });  
+    }
+    
+    this.spiaggia = function($http){        
+        var querySpiaggia = prefixQuery + baseQuery
+        +" {{?subject tipo:<http://www.geonames.org/ontology#T.PT>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#T.BCH>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#L.PRT>.}"
+        +"UNION {?subject tipo:<http://www.geonames.org/ontology#T.CAPE>.}}}";
+
+        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(querySpiaggia) + "&format=json";
+
+        $http.get(queryUrl)
+        .success(function(data, status, headers, config){
+            //Processare Poi Spiaggia
+        })
+        .error(function(status)
+        {
+            console.log(status);
+        });  
+    }
+    
+    this.myPois = function($http){        
+        var queryMyPois = prefixQuery
+        +"SELECT ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
+        +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
+        +"?subject propCoordinate:long ?latitudine. ?subject ontology:details ?descrizione."
+        +"?subject ontology:photo ?foto. ?subject tipo:<http://www.geonames.org/ontology#T.myPOIS>.}";
+
+        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(queryMyPois) + "&format=json";
+
+        $http.get(queryUrl)
+        .success(function(data, status, headers, config){
+            //Processare Poi Personali
+        })
+        .error(function(status)
+        {
+            console.log(status);
         });  
     }
 })
