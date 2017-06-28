@@ -34,7 +34,14 @@ angular.module('app.routes', [])
     controller: 'addPOICtrl'
   })
 
+    .state('login', {
+      url: '/login',
+      templateUrl: 'templates/login.html',
+      controller: 'loginCtrl'
+    })
 
-$urlRouterProvider.otherwise('/home')
+  $urlRouterProvider.otherwise('/login');
+//  $urlRouterProvider.otherwise('/home')
+
 
 });

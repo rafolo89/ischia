@@ -6,7 +6,8 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives','app.services',
-  'plgn.ionic-segment','ngCordova','ion-floating-menu'])
+  'plgn.ionic-segment','ion-floating-menu',
+  'ngCordova','ngCordovaOauth','firebase','ngStorage'])
 
 .config(function($ionicConfigProvider, $sceDelegateProvider){
 
@@ -84,4 +85,22 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       });
     }
   };
-});
+})
+
+
+  .directive('logOut', function($localStorage,$state) {
+    return {
+      link: function($scope, element ) {
+        element.on('click', function() {
+          firebase.auth().signOut().then(function() {
+
+            $localStorage.$reset();
+            $state.go("login");
+
+          }, function(error) {
+            console.log(error)
+          });
+        });
+      }
+    }
+  });
