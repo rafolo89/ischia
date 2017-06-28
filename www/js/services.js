@@ -70,6 +70,7 @@ angular.module('app.services', [])
                     "id": "",
                     "nom_poi": "",
                     "src":"",
+                    "description":"",
                     "coordinates": array[0],
                     "nom_itiner": "",
                     "percorso": "",
@@ -83,6 +84,7 @@ angular.module('app.services', [])
                     "id": "",
                     "nom_poi": "",
                     "src":"",
+                    "description":"",
                     "coordinates": array[array.length-1],
                     "nom_itiner": "",
                     "percorso": "",
@@ -101,6 +103,7 @@ angular.module('app.services', [])
          */
     this.posizionaPunto=function(array,src){
         var vectorLayer;
+        console.log(src);
         if(array=="1"){
             array=window.infoPois;
         }
@@ -120,6 +123,7 @@ angular.module('app.services', [])
                 geometry: new ol.geom.Point(ol.proj.transform(record.coordinates, 'EPSG:4326', 'EPSG:3857')),
                 nom_poi: record.nom_poi,
                 src:record.src,
+                description:record.description,
                 coordinates: record.coordinates,
                 nom_itiner: record.nom_itiner,
                 percorso: record.percorso.replace(/\'/g, ' '),
@@ -143,35 +147,7 @@ angular.module('app.services', [])
 
 })
 
-.service('datiJson', function() {
-    window.myJson=new Array();
-    var urlPathJson= new Array();
-    urlPathJson[0]="datiPoi/spiaggia.json";
-    urlPathJson[1]="datiPoi/vari.json";
-    urlPathJson[2]="datiPoi/hotel.json";
-    this.load=function($http){
-       urlPathJson.forEach(function(url){
-        var array=new Array();
-        $http.get(url)
-             .success(function(data, status, headers, config){
-                 data.lista.forEach(function(record){
-                 var obj= {
-                    "id": "",
-                    "nom_poi": record.nome,
-                    "src":"",
-                    "coordinates": [record.lon,record.lat],
-                    "nom_itiner": "",
-                    "percorso": "",
-                    "tipo_perc": "",
-                    "cod_tipo":""
-                 };
-                 array.push(obj);
-                 });
-             window.myJson.push(array);
-            })
-        })
-    }
-})
+
 .service('dati', function() {
     window.infoPois = new Array();
     window.infoPaths = new Array();
@@ -270,6 +246,7 @@ angular.module('app.services', [])
                 "nom_poi": record.properties.NOM_POI,
                 "coordinates": record.geometry.coordinates,
                 "src":"",
+                "description":"",
                 "nom_itiner": record.properties.NOM_ITINER.replace(/\'/g, ' '),
                 "percorso": record.properties.PERCORSO.replace(/\'/g, ' '),
                 "tipo_perc": record.properties.TIPO_PERC,
@@ -317,6 +294,9 @@ angular.module('app.services', [])
     }
 })
 .service('getOntology', function() {
+    
+    window.myJson=new Array();
+    
     var prefixQuery = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
         +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>";
 
@@ -326,9 +306,13 @@ angular.module('app.services', [])
     
     var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
     
-    this.hotel = function($http){        
-        var queryHotel = prefixQuery + baseQuery
-        +" {{?subject tipo:<http://www.geonames.org/ontology#S.HTL>.}"
+    this.hotel = function($http){
+        var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
+        var query = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
+        +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>"
+        +" SELECT ?nome ?longitudine ?latitudine WHERE {"
+        +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
+        +"?subject propCoordinate:long ?latitudine. {{?subject tipo:<http://www.geonames.org/ontology#S.HTL>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.MUS>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.CH>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.GDN>.}"
@@ -340,17 +324,46 @@ angular.module('app.services', [])
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.THTR>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#S.ATHF>.}}}";
 
-        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(queryHotel) + "&format=json";
-
+        var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(query) + "&format=json";
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            //Processare Poi Hotel
+            loading($http,data,2,0);
+        
         })
         .error(function(status)
         {
-            console.log(status);
-        });  
+            loading($http,status,2,0);
+        });         
     }
+    
+    function loading($http,url,n,controllo){
+        var array=new Array();
+        //console.log(url.results.bindings)
+        url.results.bindings.forEach(function(record){
+            var src, descrizione;    
+            if(controllo){
+                src=record.foto.value;    
+                descrizione=record.descrizione.value;       
+            }else{
+                src="";
+                descrizione="";
+            }
+            var obj= {
+                "id": "",
+                "nom_poi": record.nome.value,
+                "src":src,
+                "description":descrizione,
+                "coordinates": [parseFloat(record.latitudine.value),parseFloat(record.longitudine.value)],
+                "nom_itiner": "",
+                "percorso": "",
+                "tipo_perc": "",
+                "cod_tipo":""
+            };
+            array.push(obj);
+        });
+        window.myJson[n]=array;
+    }
+   
     
     this.vari = function($http){        
         var queryVari = prefixQuery + baseQuery
@@ -362,15 +375,15 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            //Processare Poi Vari
+            loading($http,data,1,0);
         })
         .error(function(status)
         {
-            console.log(status);
+            loading($http,status,1,0);
         });  
     }
     
-    this.spiaggia = function($http){        
+    this.spiaggia = function($http){     
         var querySpiaggia = prefixQuery + baseQuery
         +" {{?subject tipo:<http://www.geonames.org/ontology#T.PT>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#T.BCH>.}"
@@ -381,11 +394,11 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            //Processare Poi Spiaggia
+            loading($http,data,0,0);
         })
         .error(function(status)
         {
-            console.log(status);
+            loading($http,status,0,0);        
         });  
     }
     
@@ -400,11 +413,11 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            //Processare Poi Personali
+            loading($http,data,3,1);
         })
         .error(function(status)
         {
-            console.log(status);
+            loading($http,status,3,1);
         });  
     }
 })
