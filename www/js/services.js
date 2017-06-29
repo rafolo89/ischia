@@ -298,7 +298,7 @@ angular.module('app.services', [])
     window.myJson=new Array();
     
     var prefixQuery = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
-        +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>";
+        +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
 
     var baseQuery = " SELECT ?nome ?longitudine ?latitudine WHERE {"
         +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
@@ -402,6 +402,41 @@ angular.module('app.services', [])
         });  
     }
     
+    this.addpoint = function($http,nome,lat,long,descrizione,photo){     
+        var addpoint = prefixQuery
+        +"INSERT{<http://sws.geonames.org/myPOIS/1> ontology:name "+nome+";"
+  	+"ontology:featureClass ontology:T;"
+        +"ontology:featureCode ontology:T.myPOIS;"
+        +"ontology:countryCode 'IT';"
+        +"propCoordinate:lat "+lat+";"
+        +"propCoordinate:long "+long+";"
+        +"ontology:parentCountry <http://sws.geonames.org/3175395/>;"
+        +"ontology:parentADM1 <http://sws.geonames.org/3181042/>;"
+        +"ontology:parentADM2 <http://sws.geonames.org/3172391/>;"
+        +"ontology:details "+descrizione+";"
+	+"ontology:photo "+photo+"."
+        +"}WHERE{}";
+        var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(addpoint) ;
+        var req = {
+         method: 'POST',
+         url: queryUrl,
+         headers: {
+           'Content-Type': 'application/x-www-form-urlencoded'
+         },
+        data: { test: 'test' }
+        }
+        $http(req)
+        .success(function(data, status, headers, config){
+            console.log("data:"+status);
+                })
+        .error(function(status)
+        {
+            console.log(status);
+        });  
+    }
+    
+
+
     this.myPois = function($http){        
         var queryMyPois = prefixQuery
         +"SELECT ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
@@ -421,3 +456,4 @@ angular.module('app.services', [])
         });  
     }
 })
+

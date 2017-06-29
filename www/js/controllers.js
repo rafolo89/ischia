@@ -209,6 +209,7 @@ angular.module('app.controllers', [])
       getOntology.vari($http);
       getOntology.hotel($http);
       getOntology.myPois($http);
+      getOntology.addpoint($http);
       map;
       geosec;
       var view, vectorLayer, layer, feature, geosec, array,
