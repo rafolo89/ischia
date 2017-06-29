@@ -201,16 +201,15 @@ angular.module('app.controllers', [])
     }])
 
   .controller('homeCtrl', ['$scope', '$ionicModal', '$http', '$window', '$cordovaGeolocation', '$ionicLoading',
-    '$ionicPopup', 'dati', 'Layer', 'shareData', '$rootScope', 'getOntology', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    '$ionicPopup', 'dati', 'Layer', 'shareData', '$rootScope', 'ontology', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     function ($scope, $ionicModal, $http, $window, $cordovaGeolocation, $ionicLoading,
-              $ionicPopup, dati, Layer, shareData, $rootScope, getOntology) {
+              $ionicPopup, dati, Layer, shareData, $rootScope, ontology) {
       dati.setInfo($http, $ionicPopup, $window);
-      getOntology.spiaggia($http);
-      getOntology.deleteMyPois($http);
-      getOntology.vari($http);
-      getOntology.hotel($http);
-      getOntology.myPois($http);
-     // getOntology.addpoint($http);
+      ontology.spiaggia($http);
+      ontology.vari($http);
+      ontology.hotel($http);
+      ontology.myPois($http);
+      ontology.addpoint($http);
       map;
       geosec;
       var view, vectorLayer, layer, feature, geosec, array,
