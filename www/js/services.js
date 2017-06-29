@@ -435,6 +435,29 @@ angular.module('app.services', [])
         });  
     }
     
+    this.deleteMyPois = function($http,id){        
+        var queryMyPois = prefixQuery
+        +"DELETE{ "+id+" ?prop ?value."
+        +"}WHERE{ "+id+" ?prop ?value.}";
+
+       var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(queryMyPois) ;
+        var req = {
+         method: 'POST',
+         url: queryUrl,
+         headers: {
+           'Content-Type': 'application/x-www-form-urlencoded'
+         },
+        data: { test: 'test' }
+        }
+        $http(req)
+        .success(function(data, status, headers, config){
+            console.log("data:"+status);
+                })
+        .error(function(status)
+        {
+            console.log(status);
+        });  
+    }
 
 
     this.myPois = function($http){        
