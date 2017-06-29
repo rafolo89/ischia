@@ -435,7 +435,7 @@ angular.module('app.services', [])
 	      +"ontology:photo '"+ photo +"'."
         +"}WHERE{}";
 
-        var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(addpoint);
+        var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(addpoint) ;
         var req = {
             method: 'POST',
             url: queryUrl,
@@ -446,8 +446,7 @@ angular.module('app.services', [])
         }
         $http(req)
         .success(function(data, status, headers, config){
-          $localStorage.countPOI++;
-          console.log("COUNT "+$localStorage.countPOI);
+            console.log("data:"+status);
         })
         .error(function(status)
         {
@@ -461,31 +460,6 @@ angular.module('app.services', [])
         });
     }
 
-    this.deleteMyPois = function(id){
-        var queryMyPois = prefixQuery
-        +"DELETE{ "+id+" ?prop ?value."
-        +"}WHERE{ "+id+" ?prop ?value.}";
-
-       var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(queryMyPois) ;
-        var req = {
-         method: 'POST',
-         url: queryUrl,
-         headers: {
-           'Content-Type': 'application/x-www-form-urlencoded'
-         },
-        data: { test: 'test' }
-        }
-        $http(req)
-        .success(function(data, status, headers, config){
-            console.log("data:"+status);
-                })
-        .error(function(status)
-        {
-            console.log(status);
-        });
-    }
-
-
     this.myPois = function(uID){
         var queryMyPois = prefixQuery
         +"SELECT ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
@@ -498,7 +472,7 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            loading(data,3,1);
+            loading($http,data,3,1);
         })
         .error(function(status)
         {
