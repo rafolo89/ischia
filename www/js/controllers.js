@@ -201,15 +201,15 @@ angular.module('app.controllers', [])
     }])
 
   .controller('homeCtrl', ['$scope', '$ionicModal', '$http', '$window', '$cordovaGeolocation', '$ionicLoading',
-    '$ionicPopup', 'dati', 'Layer', 'shareData', '$rootScope', 'ontology', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    '$ionicPopup', 'dati', 'Layer', 'shareData', '$rootScope', 'ontology','$localStorage', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
     function ($scope, $ionicModal, $http, $window, $cordovaGeolocation, $ionicLoading,
-              $ionicPopup, dati, Layer, shareData, $rootScope, ontology) {
-      dati.setInfo($http, $ionicPopup, $window);
-      ontology.spiaggia($http);
-      ontology.vari($http);
-      ontology.hotel($http);
-      ontology.myPois($http);
-      ontology.addpoint($http);
+              $ionicPopup, dati, Layer, shareData, $rootScope, ontology,$localStorage) {
+      dati.setInfo($http,$ionicPopup,$window);
+      ontology.spiaggia();
+      ontology.vari();
+      ontology.hotel();
+      ontology.myPois();
+
       map;
       geosec;
       var view, vectorLayer, layer, feature, geosec, array,
@@ -367,7 +367,7 @@ angular.module('app.controllers', [])
           if (feature.get('src'))
             stringa += "<br><img  width='100%' height='100%'  src='" + feature.get('src') + "'><br>";
             if (feature.get('description'))
-            stringa += "<br><b>Descrizione:<br></b>" + feature.get('description');         
+            stringa += "<br><b>Descrizione:<br></b>" + feature.get('description');
           if (feature.get('nom_itiner'))
             stringa += "<br><b>Nome percorso:<br></b>" + feature.get('percorso') + "<br><b>Nome itinerario:<br></b>" + feature.get('nom_itiner');
           var createPOIPopup = $ionicPopup.show({
@@ -381,7 +381,6 @@ angular.module('app.controllers', [])
             }]
           });
         }
-        ;
       });
 
       //apertura del modal
@@ -540,7 +539,6 @@ angular.module('app.controllers', [])
                       console.log(poi)
                     }
                   }
-
                   //iserisco la nuova variabile modificata
                   localStorage.setItem(idPath, JSON.stringify(allPoiPersonalArray));
 
@@ -570,6 +568,7 @@ angular.module('app.controllers', [])
       /*funzione di supporto per creare un oggetto POI con le coordinate*/
       function insertPOI(path) {
         var objPOI = {
+          id:"<http://sws.geonames.org/"+$localStorage.uid+"/"+ $localStorage.countPOI+">",
           nom_poi: $scope.newPoi.nom_poi,
           coordinates: $scope.newPoi.coordinates,
           src: imageSrc,
@@ -578,6 +577,10 @@ angular.module('app.controllers', [])
           cod_tipo: path.cod_tipo,
           description: $scope.newPoi.description
         };
+
+         ontology.addPoi($localStorage.uid,$localStorage.countPOI,objPOI.nom_poi,
+          objPOI.coordinates[1],objPOI.coordinates[0],objPOI.description,objPOI.src);
+
         return objPOI;
       }
 
@@ -716,13 +719,17 @@ angular.module('app.controllers', [])
       }
       else {
         $scope.login = function () {
+
           var provider = new firebase.auth.FacebookAuthProvider();
           firebase.auth().signInWithPopup(provider).then(function (result) {
             // This gives you a Facebook Access Token. You can use it to access the Facebook API.
             var token = result.credential.accessToken;
+
             // The signed-in user info.
             var user = result.user;
+            $localStorage.countPOI = 0;
             $localStorage.uid = result.user.uid;
+            $state.go("home");
           }).catch(function (error) {
             // Handle Errors here.
             var errorCode = error.code;

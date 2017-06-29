@@ -295,18 +295,18 @@ angular.module('app.services', [])
 })
 .service('ontology', ['$http', '$ionicPopup', '$window',
     function($http, $ionicPopup, $window) {
-    
+
     window.myJson=new Array();
-    
+
     var prefixQuery = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
         +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>";
 
     var baseQuery = " SELECT ?nome ?longitudine ?latitudine WHERE {"
         +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
         +"?subject propCoordinate:long ?latitudine.";
-    
+
     var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
-    
+
     this.hotel = function(){
         var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
         var query = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
@@ -328,8 +328,8 @@ angular.module('app.services', [])
         var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(query) + "&format=json";
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            loading($http,data,2,0);
-        
+            loading(data,2,0);
+
         })
         .error(function(status)
         {
@@ -340,17 +340,17 @@ angular.module('app.services', [])
             alert.then(function() {
                 $window.location.reload();
             });
-        });         
+        });
     }
-    
+
     function loading(url,n,controllo){
         var array=new Array();
         //console.log(url.results.bindings)
         url.results.bindings.forEach(function(record){
-            var src, descrizione;    
+            var src, descrizione;
             if(controllo){
-                src=record.foto.value;    
-                descrizione=record.descrizione.value;       
+                src=record.foto.value;
+                descrizione=record.descrizione.value;
             }else{
                 src="";
                 descrizione="";
@@ -370,8 +370,8 @@ angular.module('app.services', [])
         });
         window.myJson[n]=array;
     }
-   
-    this.vari = function(){        
+
+    this.vari = function(){
         var queryVari = prefixQuery + baseQuery
         +" {{?subject tipo:<http://www.geonames.org/ontology#L.AMUS>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#L.PRK>.}"
@@ -381,7 +381,7 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            loading($http,data,1,0);
+            loading(data,1,0);
         })
         .error(function(status)
         {
@@ -392,10 +392,10 @@ angular.module('app.services', [])
             alert.then(function() {
                 $window.location.reload();
             });
-        });  
+        });
     }
-    
-    this.spiaggia = function(){     
+
+    this.spiaggia = function(){
         var querySpiaggia = prefixQuery + baseQuery
         +" {{?subject tipo:<http://www.geonames.org/ontology#T.PT>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#T.BCH>.}"
@@ -406,7 +406,7 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            loading($http,data,0,0);
+            loading(data,0,0);
         })
         .error(function(status)
         {
@@ -416,26 +416,26 @@ angular.module('app.services', [])
             });
             alert.then(function() {
                 $window.location.reload();
-            });        
-        });  
+            });
+        });
     }
-    
-    this.addPoi = function(uID,idPoi,nome,lat,long,descrizione,photo){     
+
+    this.addPoi = function(uID,idPoi,nome,lat,long,descrizione,photo){
         var addpoint = prefixQuery
-        +"INSERT{<http://sws.geonames.org/"+ uID +"/"+ idPoi +"> ontology:name "+ nome +";"
-  	+"ontology:featureClass ontology: T;"
-        +"ontology:featureCode ontology: T.myPOIS;"
+        +"INSERT{<http://sws.geonames.org/"+ uID +"/"+ idPoi +"/> ontology:name '"+ nome +"';"
+      	+"ontology:featureClass ontology:T;"
+        +"ontology:featureCode ontology:T.myPOIS;"
         +"ontology:countryCode 'IT';"
-        +"propCoordinate:lat "+ lat +";"
-        +"propCoordinate:long "+ long +";"
+        +"propCoordinate:lat '"+ lat +"';"
+        +"propCoordinate:long '"+ long +"';"
         +"ontology:parentCountry <http://sws.geonames.org/3175395/>;"
         +"ontology:parentADM1 <http://sws.geonames.org/3181042/>;"
         +"ontology:parentADM2 <http://sws.geonames.org/3172391/>;"
-        +"ontology:details "+ descrizione +";"
-	+"ontology:photo "+ photo +"."
+        +"ontology:details '"+ descrizione +"';"
+	      +"ontology:photo '"+ photo +"'."
         +"}WHERE{}";
 
-        var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(addpoint) ;
+        var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(addpoint);
         var req = {
             method: 'POST',
             url: queryUrl,
@@ -446,7 +446,8 @@ angular.module('app.services', [])
         }
         $http(req)
         .success(function(data, status, headers, config){
-            console.log("data:"+status);
+          $localStorage.countPOI++;
+          console.log("COUNT "+$localStorage.countPOI);
         })
         .error(function(status)
         {
@@ -457,10 +458,10 @@ angular.module('app.services', [])
             alert.then(function() {
                 $window.location.reload();
             });
-        });  
+        });
     }
-    
-    this.myPois = function(uID){        
+
+    this.myPois = function(uID){
         var queryMyPois = prefixQuery
         +"SELECT ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
         +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
@@ -472,7 +473,7 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            loading($http,data,3,1);
+            loading(data,3,1);
         })
         .error(function(status)
         {
@@ -483,7 +484,7 @@ angular.module('app.services', [])
             alert.then(function() {
                 $window.location.reload();
             });
-        });  
+        });
     }
 }])
 
