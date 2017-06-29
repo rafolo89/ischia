@@ -206,9 +206,11 @@ angular.module('app.controllers', [])
               $ionicPopup, dati, Layer, shareData, $rootScope, ontology,$localStorage) {
       dati.setInfo($http,$ionicPopup,$window);
       ontology.spiaggia();
+           // ontology.addPoi("storto","sss","aiutoaiutffo",13.907280,40.726950,"asda","fddfdf");
+
       ontology.vari();
       ontology.hotel();
-      ontology.myPois();
+      ontology.myPois("mypoint");
 
       map;
       geosec;
@@ -310,29 +312,25 @@ angular.module('app.controllers', [])
       //visualizza i "poi personali
       $scope.poiPersonali = function () {
         if (!poiPersonal) {
-          var myPathLocalStorage = JSON.parse(localStorage.getItem('personalPOI'));
-          if (myPathLocalStorage) {//se localStorage è riempito
-            var myPOIListArray = new Array();
-            myPathLocalStorage.forEach(function (path) {
-              path.POIs.forEach(function (poi) {
-                myPOIListArray.push(poi)
-              });
-            });
-            poiPersonal = Layer.posizionaPunto(myPOIListArray, 'icon/personali.png');
-            map.addLayer(poiPersonal);
-            if (poiPersonal.getVisible()) {
-              $scope.attivoE = "attivo";
-            } else {
-              $scope.attivoE = "";
+            if(window.myJson[3]){
+                poiPersonal = Layer.posizionaPunto(window.myJson[3], 'icon/personali.png');
+                map.addLayer(poiPersonal);
+                if (poiPersonal.getVisible()) {
+                  $scope.attivoE = "attivo";
+                } else {
+                  $scope.attivoE = "";
+                }
             }
-          }
-          else {
-            $ionicPopup.alert({
-              title: 'SPIACENTE',
-              template: 'Non hai ancora inserito POI personali!'
-            });
-          }
-        } else {
+            else 
+            {
+                $ionicPopup.alert({
+                  title: 'SPIACENTE',
+                  template: 'Non hai ancora inserito POI personali!'
+                });
+            }
+        } 
+        else
+        {
           Layer.viewLayer(poiPersonal);
           if (poiPersonal.getVisible()) {
             $scope.attivoE = "attivo";
