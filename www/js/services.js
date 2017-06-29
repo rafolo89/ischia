@@ -293,7 +293,8 @@ angular.module('app.services', [])
         }
     }
 })
-.service('ontology', function() {
+.service('ontology', ['$http', '$ionicPopup', '$window',
+    function($http, $ionicPopup, $window) {
     
     window.myJson=new Array();
     
@@ -306,7 +307,7 @@ angular.module('app.services', [])
     
     var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
     
-    this.hotel = function($http){
+    this.hotel = function(){
         var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
         var query = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
         +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>"
@@ -332,11 +333,17 @@ angular.module('app.services', [])
         })
         .error(function(status)
         {
-            loading($http,status,2,0);
+            var alert = $ionicPopup.alert({
+                    title: 'MARKER SEMANTICI',
+                    template: 'Riprovare più tardi!'
+            });
+            alert.then(function() {
+                $window.location.reload();
+            });
         });         
     }
     
-    function loading($http,url,n,controllo){
+    function loading(url,n,controllo){
         var array=new Array();
         //console.log(url.results.bindings)
         url.results.bindings.forEach(function(record){
@@ -364,8 +371,7 @@ angular.module('app.services', [])
         window.myJson[n]=array;
     }
    
-    
-    this.vari = function($http){        
+    this.vari = function(){        
         var queryVari = prefixQuery + baseQuery
         +" {{?subject tipo:<http://www.geonames.org/ontology#L.AMUS>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#L.PRK>.}"
@@ -379,11 +385,17 @@ angular.module('app.services', [])
         })
         .error(function(status)
         {
-            loading($http,status,1,0);
+            var alert = $ionicPopup.alert({
+                    title: 'MARKER SEMANTICI',
+                    template: 'Riprovare più tardi!'
+            });
+            alert.then(function() {
+                $window.location.reload();
+            });
         });  
     }
     
-    this.spiaggia = function($http){     
+    this.spiaggia = function(){     
         var querySpiaggia = prefixQuery + baseQuery
         +" {{?subject tipo:<http://www.geonames.org/ontology#T.PT>.}"
         +"UNION {?subject tipo:<http://www.geonames.org/ontology#T.BCH>.}"
@@ -398,11 +410,17 @@ angular.module('app.services', [])
         })
         .error(function(status)
         {
-            loading($http,status,0,0);        
+            var alert = $ionicPopup.alert({
+                    title: 'MARKER SEMANTICI',
+                    template: 'Riprovare più tardi!'
+            });
+            alert.then(function() {
+                $window.location.reload();
+            });        
         });  
     }
     
-    this.addPoi = function($http,uID,idPoi,nome,lat,long,descrizione,photo){     
+    this.addPoi = function(uID,idPoi,nome,lat,long,descrizione,photo){     
         var addpoint = prefixQuery
         +"INSERT{<http://sws.geonames.org/"+ uID +"/"+ idPoi +"> ontology:name "+ nome +";"
   	+"ontology:featureClass ontology: T;"
@@ -432,16 +450,23 @@ angular.module('app.services', [])
         })
         .error(function(status)
         {
-            console.log(status);
+            var alert = $ionicPopup.alert({
+                    title: 'MARKER SEMANTICI',
+                    template: 'Riprovare più tardi!'
+            });
+            alert.then(function() {
+                $window.location.reload();
+            });
         });  
     }
     
-    this.myPois = function($http){        
+    this.myPois = function(uID){        
         var queryMyPois = prefixQuery
         +"SELECT ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
         +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
         +"?subject propCoordinate:long ?latitudine. ?subject ontology:details ?descrizione."
-        +"?subject ontology:photo ?foto. ?subject tipo:<http://www.geonames.org/ontology#T.myPOIS>.}";
+        +"?subject ontology:photo ?foto."
+        +"FILTER(regex(str(?subject),'http://sws.geonames.org/"+ uID +"/')).}";
 
         var queryUrl = url_to_endpoint + "?query=" + encodeURIComponent(queryMyPois) + "&format=json";
 
@@ -451,8 +476,14 @@ angular.module('app.services', [])
         })
         .error(function(status)
         {
-            loading($http,status,3,1);
+            var alert = $ionicPopup.alert({
+                    title: 'MARKER SEMANTICI',
+                    template: 'Riprovare più tardi!'
+            });
+            alert.then(function() {
+                $window.location.reload();
+            });
         });  
     }
-})
+}])
 
