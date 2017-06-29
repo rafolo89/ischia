@@ -206,10 +206,11 @@ angular.module('app.controllers', [])
               $ionicPopup, dati, Layer, shareData, $rootScope, getOntology) {
       dati.setInfo($http, $ionicPopup, $window);
       getOntology.spiaggia($http);
+      getOntology.deleteMyPois($http);
       getOntology.vari($http);
       getOntology.hotel($http);
       getOntology.myPois($http);
-      getOntology.addpoint($http);
+     // getOntology.addpoint($http);
       map;
       geosec;
       var view, vectorLayer, layer, feature, geosec, array,
