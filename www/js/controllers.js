@@ -4,8 +4,8 @@ angular.module('app.controllers', [])
     function ($scope, $stateParams) {
     }])
 
-  .controller('cercaPercorsoCtrl', ['$scope', 'shareData', 'Layer', '$ionicPopup', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
-    function ($scope, shareData, Layer, $ionicPopup) {
+  .controller('cercaPercorsoCtrl', ['$scope', 'shareData', 'Layer', '$ionicPopup','ontology', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+    function ($scope, shareData, Layer, $ionicPopup,ontology) {
       $scope.difficoltaPOI = 0;
       $scope.difficoltaPATH = 0;
 
@@ -168,6 +168,10 @@ angular.module('app.controllers', [])
         var myPathLocalStorage = JSON.parse(localStorage.getItem('personalPOI'));
         for (var i = 0; i < myPathLocalStorage.length; i++) {
           if (myPathLocalStorage[i].id === myPath.id) {
+             myPathLocalStorage[i].POIs.forEach(function (record){
+                 console.log(record.id);
+                ontology.deleteMyPois(record.id);
+             })
             $scope.exit();
             myPathLocalStorage.splice(i, 1);
           }
@@ -210,7 +214,7 @@ angular.module('app.controllers', [])
 
       ontology.vari();
       ontology.hotel();
-      ontology.myPois("mypoint");
+      ontology.myPois($localStorage.uid);
 
       map;
       geosec;
@@ -311,6 +315,8 @@ angular.module('app.controllers', [])
 
       //visualizza i "poi personali
       $scope.poiPersonali = function () {
+                    ontology.myPois($localStorage.uid);
+
         if (!poiPersonal) {
             if(window.myJson[3]){
                 poiPersonal = Layer.posizionaPunto(window.myJson[3], 'icon/personali.png');
@@ -575,10 +581,10 @@ angular.module('app.controllers', [])
           cod_tipo: path.cod_tipo,
           description: $scope.newPoi.description
         };
-
+        console.log("ciaone");
          ontology.addPoi($localStorage.uid,$localStorage.countPOI,objPOI.nom_poi,
           objPOI.coordinates[1],objPOI.coordinates[0],objPOI.description,objPOI.src);
-
+         //ricarica poi personali dall'ontologia dopo l'aggiunta di un nuovo punto
         return objPOI;
       }
 
@@ -716,10 +722,28 @@ angular.module('app.controllers', [])
         $state.go("home");
       }
       else {
-        $scope.login = function () {
-
+          $scope.login = function () {
+          $cordovaOauth.facebook("324449771326573", ["email"]).then(function (result) {
+            var credentials = firebase.auth.FacebookAuthProvider.credential(result.access_token);
+            $localStorage.accessToken = result.access_token;
+            return firebase.auth().signInWithCredential(credentials);
+          }).then(function (firebaseUser) {
+            //memorizza firebaseUser.uid
+            $localStorage.uid = firebaseUser.uid;
+            $localStorage.countPOI = 0;
+            $state.go("home");
+          }).catch(function (error) {
+            $ionicPopup.alert({
+              title: 'Error',
+              template: 'Authentication failed'
+            });
+            console.error("Authentication failed:", error);
+          });
+        }
+        /*$scope.login = function () {
           var provider = new firebase.auth.FacebookAuthProvider();
           firebase.auth().signInWithPopup(provider).then(function (result) {
+              con
             // This gives you a Facebook Access Token. You can use it to access the Facebook API.
             var token = result.credential.accessToken;
 
@@ -737,7 +761,7 @@ angular.module('app.controllers', [])
             // The firebase.auth.AuthCredential type that was used.
             var credential = error.credential;
           });
-        }
+        }*/
       }
     }
   ]);

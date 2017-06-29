@@ -293,8 +293,8 @@ angular.module('app.services', [])
         }
     }
 })
-.service('ontology', ['$http', '$ionicPopup', '$window',
-    function($http, $ionicPopup, $window) {
+.service('ontology', ['$http', '$ionicPopup', '$window','$localStorage',
+    function($http, $ionicPopup, $window,$localStorage) {
 
     window.myJson=new Array();
 
@@ -305,10 +305,10 @@ angular.module('app.services', [])
         +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
         +"?subject propCoordinate:long ?latitudine.";
 
-    var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
+    var url_to_endpoint = 'http://'+getIp()+':3030/IschiaMap/query';
 
     this.hotel = function(){
-        var url_to_endpoint = 'http://localhost:3030/IschiaMap/query';
+        var url_to_endpoint = 'http://'+getIp()+':3030/IschiaMap/query';
         var query = "PREFIX ontology: <http://www.geonames.org/ontology#> PREFIX propCoordinate: <http://www.w3.org/2003/01/geo/wgs84_pos#>"
         +"PREFIX tipo: <http://www.geonames.org/ontology#featureCode>"
         +" SELECT ?nome ?longitudine ?latitudine WHERE {"
@@ -419,10 +419,38 @@ angular.module('app.services', [])
             });
         });
     }
+    
+    function getIp(){
+        return "172.19.35.57";
+    }
+    
+    this.deleteMyPois = function(id){        
+        var queryMyPois = prefixQuery
+            +"DELETE{ "+id+" ?prop ?value."
+            +"}WHERE{ "+id+" ?prop ?value.}";
+        var queryUrl = "http://"+getIp()+":3030/IschiaMap/update?update="  + encodeURIComponent(queryMyPois) ;
+        var req = {
+         method: 'POST',
+         url: queryUrl,
+         headers: {
+           'Content-Type': 'application/x-www-form-urlencoded'
+         },
+        data: { test: 'test' }
+        }
+        $http(req)
+        .success(function(data, status, headers, config){
+            console.log("data:"+status);
+                })
+        .error(function(status)
+        {
+            console.log(status);
+        });  
+    }
+
 
     this.addPoi = function(uID,idPoi,nome,lat,long,descrizione,photo){
         var addpoint = prefixQuery
-        +"INSERT{<http://sws.geonames.org/"+ uID +"/"+ idPoi +"/> ontology:name '"+ nome +"';"
+        +"INSERT{<http://sws.geonames.org/"+ uID +"/"+ idPoi +"> ontology:name '"+ nome +"';"
       	+"ontology:featureClass ontology:T;"
         +"ontology:featureCode ontology:T.myPOIS;"
         +"ontology:countryCode 'IT';"
@@ -435,7 +463,7 @@ angular.module('app.services', [])
 	      +"ontology:photo '"+ photo +"'."
         +"}WHERE{}";
 
-        var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(addpoint) ;
+        var queryUrl = "http://"+getIp()+":3030/IschiaMap/update?update="  + encodeURIComponent(addpoint) ;
         var req = {
             method: 'POST',
             url: queryUrl,
@@ -444,9 +472,11 @@ angular.module('app.services', [])
             },
             data: { test: 'test' }
         }
+        
         $http(req)
         .success(function(data, status, headers, config){
-            console.log("data:"+status);
+                console.log("ok");
+                $localStorage.countPOI++;
         })
         .error(function(status)
         {
@@ -462,7 +492,7 @@ angular.module('app.services', [])
 
     this.myPois = function(uID){
         var queryMyPois = prefixQuery
-        +"SELECT ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
+        +"SELECT ?subject ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
         +"?subject ontology:name ?nome. ?subject propCoordinate:lat ?longitudine."
         +"?subject propCoordinate:long ?latitudine. ?subject ontology:details ?descrizione."
         +"?subject ontology:photo ?foto."
