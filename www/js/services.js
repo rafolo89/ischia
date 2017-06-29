@@ -472,7 +472,7 @@ angular.module('app.services', [])
 
         $http.get(queryUrl)
         .success(function(data, status, headers, config){
-            loading($http,data,3,1);
+            loading(data,3,1);
         })
         .error(function(status)
         {
