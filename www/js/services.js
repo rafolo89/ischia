@@ -293,7 +293,7 @@ angular.module('app.services', [])
         }
     }
 })
-.service('getOntology', function() {
+.service('ontology', function() {
     
     window.myJson=new Array();
     
@@ -402,41 +402,40 @@ angular.module('app.services', [])
         });  
     }
     
-    this.addpoint = function($http,nome,lat,long,descrizione,photo){     
+    this.addPoi = function($http,uID,idPoi,nome,lat,long,descrizione,photo){     
         var addpoint = prefixQuery
-        +"INSERT{<http://sws.geonames.org/myPOIS/1> ontology:name "+nome+";"
-  	+"ontology:featureClass ontology:T;"
-        +"ontology:featureCode ontology:T.myPOIS;"
+        +"INSERT{<http://sws.geonames.org/"+ uID +"/"+ idPoi +"> ontology:name "+ nome +";"
+  	+"ontology:featureClass ontology: T;"
+        +"ontology:featureCode ontology: T.myPOIS;"
         +"ontology:countryCode 'IT';"
-        +"propCoordinate:lat "+lat+";"
-        +"propCoordinate:long "+long+";"
+        +"propCoordinate:lat "+ lat +";"
+        +"propCoordinate:long "+ long +";"
         +"ontology:parentCountry <http://sws.geonames.org/3175395/>;"
         +"ontology:parentADM1 <http://sws.geonames.org/3181042/>;"
         +"ontology:parentADM2 <http://sws.geonames.org/3172391/>;"
-        +"ontology:details "+descrizione+";"
-	+"ontology:photo "+photo+"."
+        +"ontology:details "+ descrizione +";"
+	+"ontology:photo "+ photo +"."
         +"}WHERE{}";
+
         var queryUrl = "http://localhost:3030/IschiaMap/update?update="  + encodeURIComponent(addpoint) ;
         var req = {
-         method: 'POST',
-         url: queryUrl,
-         headers: {
-           'Content-Type': 'application/x-www-form-urlencoded'
-         },
-        data: { test: 'test' }
+            method: 'POST',
+            url: queryUrl,
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            data: { test: 'test' }
         }
         $http(req)
         .success(function(data, status, headers, config){
             console.log("data:"+status);
-                })
+        })
         .error(function(status)
         {
             console.log(status);
         });  
     }
     
-
-
     this.myPois = function($http){        
         var queryMyPois = prefixQuery
         +"SELECT ?nome ?longitudine ?latitudine ?descrizione ?foto WHERE {"
